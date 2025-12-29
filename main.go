@@ -44,6 +44,7 @@ func getTasks(w http.ResponseWriter, r *http.Request) {
 	resp, err := json.MarshalIndent(tasks, "", "  ")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -56,14 +57,14 @@ func postTask(w http.ResponseWriter, r *http.Request) {
 
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
-		fmt.Println("1")
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	err = json.Unmarshal(buf.Bytes(), &task)
 	if err != nil {
-		fmt.Println("0")
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 	tasks[task.ID] = task
 
@@ -77,11 +78,13 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 	task, ok := tasks[id]
 	if !ok {
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	resp, err := json.MarshalIndent(task, "", "  ")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -94,6 +97,7 @@ func deleteTask(w http.ResponseWriter, r *http.Request) {
 	_, ok := tasks[id]
 	if !ok {
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 	delete(tasks, id)
 	w.Header().Set("Content-Type", "application/json")
